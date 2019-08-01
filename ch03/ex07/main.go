@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	iterations = 30
-	contrast   = 5
-	maxcmpl    = 1e-6
+	iterations = 10
+	contrast   = 2
+	maxcmpl    = 1e-5
 )
 
 func main() {
