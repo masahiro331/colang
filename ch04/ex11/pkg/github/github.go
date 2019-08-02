@@ -26,8 +26,15 @@ type Issue struct {
 type User struct {
 	Login string
 }
+type GithubClient struct {
+	token string
+}
 
-func CreateIssue(token string) error {
+func NewGithubClient(token string) *GithubClient {
+	return &GithubClient{token: token}
+}
+
+func (gc GithubClient) CreateIssue() error {
 	issue, err := CreateIssueBody()
 	if err != nil {
 		return err
@@ -42,7 +49,7 @@ func CreateIssue(token string) error {
 		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "token "+token)
+	req.Header.Set("Authorization", "token "+gc.token)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -62,24 +69,24 @@ func CreateIssue(token string) error {
 func CreateIssueBody() (Issue, error) {
 	body := Issue{}
 
-	title, err := editor.MessageAndInput("title: ")
+	title, err := editor.MessageInput("Issue Title: ")
 	if err != nil {
 		return Issue{}, err
 	}
 	body.Title = title
 
-	body.Body, err = editor.MessageAndInput("body: ")
+	body.Body, err = editor.MessageInput("Issue Message: ")
 	if err != nil {
 		return Issue{}, err
 	}
 
 	body.Title = title
-	input, err := editor.MessageAndInput("asignees(, separated): ")
+	input, err := editor.MessageInput("Issue asginees: ")
 	if err != nil {
 		return Issue{}, err
 	}
 
-	input, err = editor.MessageAndInput("labels(, separated): ")
+	input, err = editor.MessageInput("Issue Labels: ")
 	labels := strings.Split(input, ",")
 	for _, label := range labels {
 		if label != "" {
@@ -89,43 +96,10 @@ func CreateIssueBody() (Issue, error) {
 	return body, nil
 }
 
-func PatchIssue(token string, number int) error {
-	url := IssueURL + strconv.Itoa(number)
-	ReadIssue(token, number)
-	issue, err := CreateIssueBody()
-	if err != nil {
-		return err
-	}
-	bodyJSON, err := json.Marshal(issue)
-	if err != nil {
-		return err
-	}
-	req, err := http.NewRequest("PATCH", url, bytes.NewBuffer([]byte(bodyJSON)))
-	if err != nil {
-		return err
-	}
-
-	req.Header.Set("Authorization", "token "+token)
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("patch issue failed: %s", resp.Status)
-	}
-	defer resp.Body.Close()
-	b, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(b))
-	return nil
-}
-
-func CloseIssue(token string, number int) error {
+func (gc GithubClient) CloseIssue(number int) error {
 	url := IssueURL + strconv.Itoa(number)
 
-	ReadIssue(token, number)
+	ReadIssue(number)
 	issue := Issue{State: "closed"}
 	bodyJSON, err := json.Marshal(issue)
 	if err != nil {
@@ -135,7 +109,7 @@ func CloseIssue(token string, number int) error {
 	if err != nil {
 		return err
 	}
-	req.Header.Set("Authorization", "token "+token)
+	req.Header.Set("Authorization", "token "+gc.token)
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -152,12 +126,12 @@ func CloseIssue(token string, number int) error {
 	return nil
 }
 
-func ListIssue(token string) error {
+func (gc GithubClient) ListIssue() error {
 	req, err := http.NewRequest("GET", IssueURL, nil)
 	if err != nil {
 		return err
 	}
-	req.Header.Set("Authorization", "token "+token)
+	req.Header.Set("Authorization", "token "+gc.token)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -181,14 +155,12 @@ func ListIssue(token string) error {
 	return nil
 }
 
-func ReadIssue(token string, number int) error {
+func ReadIssue(number int) error {
 	url := IssueURL + strconv.Itoa(number)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return err
 	}
-	req.Header.Set("Authorization", "token "+token)
-
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {

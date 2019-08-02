@@ -8,12 +8,12 @@ func main() {
 }
 
 func uniq(slice []string) []string {
-	prestr := ""
-	for i, str := range slice {
-		if i != 0 && prestr == str {
-			slice = append(slice[:i], slice[i+1:]...)
+	i := 0
+	for _, str := range slice {
+		if i == 0 || str != slice[i-1] {
+			slice[i] = str
+			i++
 		}
-		prestr = str
 	}
-	return slice
+	return slice[:i]
 }

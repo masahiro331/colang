@@ -15,15 +15,16 @@ func main() {
 	}
 
 	token := ""
+	client := github.NewGithubClient(token)
 
 	switch os.Args[1] {
 	case "create":
-		err = github.CreateIssue(token)
+		err = client.CreateIssue()
 		if err != nil {
 			log.Fatal(err)
 		}
 	case "list":
-		err = github.ListIssue(token)
+		err = client.ListIssue()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -39,23 +40,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		err = github.ReadIssue(token, number)
-		if err != nil {
-			log.Fatal(err)
-		}
-	case "patch":
-		if len(os.Args) < 3 {
-			log.Fatal("ArgumentError")
-		}
-		issueNumber := os.Args[2]
-		if err != nil {
-			log.Fatal(err)
-		}
-		number, err := strconv.Atoi(issueNumber)
-		if err != nil {
-			log.Fatal(err)
-		}
-		err = github.PatchIssue(token, number)
+		err = github.ReadIssue(number)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -71,7 +56,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		err = github.CloseIssue(token, number)
+		err = client.CloseIssue(number)
 		if err != nil {
 			log.Fatal(err)
 		}
