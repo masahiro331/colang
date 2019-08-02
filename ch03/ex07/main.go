@@ -9,15 +9,15 @@ import (
 )
 
 const (
-	iterations = 10
-	contrast   = 2
-	maxcmpl    = 1e-5
+	iter     = 10
+	contrast = 2
+	maxcmpl  = 1e-5
 )
 
 func main() {
 	const (
 		xmin, ymin, xmax, ymax = -2.0, -2.0, +2.0, +2.0
-		width, height          = 1024, 1024
+		width, height          = 256, 256
 	)
 
 	img := image.NewRGBA(image.Rect(0, 0, width, height))
@@ -34,19 +34,16 @@ func main() {
 }
 
 func newton(z complex128) color.Color {
-	for i := uint8(0); i < iterations; i++ {
+	for i := uint8(0); i < iter; i++ {
 		z -= (z - 1/(z*z*z)) / 4
 		if cmplx.Abs(z*z*z*z-1) < maxcmpl {
-			c := archcos(z)
-			r, g, b, a := c.RGBA()
+
+			r, g, b, a := archtan(z).RGBA()
 			return color.RGBA{uint8(r) / (i + 1), uint8(g) / (i + 1), uint8(b) / (i + 1), uint8(a)}
 		}
 	}
 	return color.Black
 }
-func archcos(z complex128) color.Color {
-	v := cmplx.Acos(z)
-	blue := uint8(real(v)*128) + 127
-	red := uint8(imag(v)*128) + 127
-	return color.YCbCr{192, blue, red}
+func archtan(z complex128) color.Color {
+	return color.YCbCr{192, uint8(real(cmplx.Atan(z))), uint8(imag(cmplx.Atan(z)))}
 }

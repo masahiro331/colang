@@ -7,21 +7,19 @@ import (
 )
 
 func main() {
-	rs := []rune{' ', '\t', 'H', 'e', 'l', 'l', 'o', '\t', ' ', '　', '\t', 'w', 'o', 'r', 'l', 'd', '\r', '\v'}
+	rs := []rune{' ', ' ', ' ', ' ', ' ', ' ', ' ', 'H', 'e', 'l', 'l', 'o', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', ' ', '　', '\t', 'w', 'o', 'r', 'l', 'd', '!'}
 	bytes := []byte(string(rs))
-	fmt.Println(string(compressSpace(bytes)))
+	fmt.Println(string(cs(bytes)))
 }
 
-func compressSpace(bytes []byte) []byte {
+func cs(bytes []byte) []byte {
 	i := 0
 	for j := 0; j < len(bytes); {
-		r, size := utf8.DecodeRune(bytes[j:])
+		b, size := utf8.DecodeRune(bytes[j:])
+
 		last, _ := utf8.DecodeLastRune(bytes[:i])
-		if !unicode.IsSpace(last) || !unicode.IsSpace(r) {
-			if unicode.IsSpace(r) {
-				r = ' '
-			}
-			_ = utf8.EncodeRune(bytes[i:], r)
+		if !unicode.IsSpace(last) || !unicode.IsSpace(b) {
+			utf8.EncodeRune(bytes[i:], b)
 			i += size
 		}
 		j += size
