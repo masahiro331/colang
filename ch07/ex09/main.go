@@ -46,17 +46,17 @@ func printTrakcs(tracks []*Track) {
 	tw.Flush()
 }
 
-type multiSort struct {
+type CustomSort struct {
 	t    []*Track
 	less func(x, y *Track) bool
 }
 
-func (m multiSort) Len() int           { return len(m.t) }
-func (m multiSort) Less(i, j int) bool { return m.less(m.t[i], m.t[j]) }
-func (m multiSort) Swap(i, j int)      { m.t[i], m.t[j] = m.t[j], m.t[i] }
+func (m CustomSort) Len() int           { return len(m.t) }
+func (m CustomSort) Less(i, j int) bool { return m.less(m.t[i], m.t[j]) }
+func (m CustomSort) Swap(i, j int)      { m.t[i], m.t[j] = m.t[j], m.t[i] }
 
-func (m multiSort) byTitle() multiSort {
-	return multiSort{m.t, func(x, y *Track) bool {
+func (m CustomSort) byTitle() CustomSort {
+	return CustomSort{m.t, func(x, y *Track) bool {
 		if x.Title != y.Title {
 			return x.Title < y.Title
 		}
@@ -64,8 +64,8 @@ func (m multiSort) byTitle() multiSort {
 	}}
 }
 
-func (m multiSort) byArtist() multiSort {
-	return multiSort{m.t, func(x, y *Track) bool {
+func (m CustomSort) byArtist() CustomSort {
+	return CustomSort{m.t, func(x, y *Track) bool {
 		if x.Artist != y.Artist {
 			return x.Artist < y.Artist
 		}
@@ -73,8 +73,8 @@ func (m multiSort) byArtist() multiSort {
 	}}
 }
 
-func (m multiSort) byAlbum() multiSort {
-	return multiSort{m.t, func(x, y *Track) bool {
+func (m CustomSort) byAlbum() CustomSort {
+	return CustomSort{m.t, func(x, y *Track) bool {
 		if x.Album != y.Album {
 			return x.Album < y.Album
 		}
@@ -82,8 +82,8 @@ func (m multiSort) byAlbum() multiSort {
 	}}
 }
 
-func (m multiSort) byYear() multiSort {
-	return multiSort{m.t, func(x, y *Track) bool {
+func (m CustomSort) byYear() CustomSort {
+	return CustomSort{m.t, func(x, y *Track) bool {
 		if x.Year != y.Year {
 			return x.Year < y.Year
 		}
@@ -91,8 +91,8 @@ func (m multiSort) byYear() multiSort {
 	}}
 }
 
-func (m multiSort) byLength() multiSort {
-	return multiSort{m.t, func(x, y *Track) bool {
+func (m CustomSort) byLength() CustomSort {
+	return CustomSort{m.t, func(x, y *Track) bool {
 		if x.Length != y.Length {
 			return x.Length < y.Length
 		}
@@ -101,7 +101,6 @@ func (m multiSort) byLength() multiSort {
 }
 
 var trackList = template.Must(template.New("trackTable").Parse(`
-<h1>Go music</h1>
 <table>
 <tr style='text-align: left'>
   <th><a href='{{.NewURL "Title"}}'>Title</a></th>
@@ -147,12 +146,12 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 }
-func newMultiSort(t []*Track) multiSort {
-	s := multiSort{t: t, less: func(x, y *Track) bool { return false }}
+func newCustomSort(t []*Track) CustomSort {
+	s := CustomSort{t: t, less: func(x, y *Track) bool { return false }}
 	return s
 }
 func sortByQuery(t []*Track, q url.Values) {
-	s := newMultiSort(t)
+	s := newCustomSort(t)
 	for _, key := range q["sort"] {
 		switch key {
 		case "Title":

@@ -42,22 +42,22 @@ func printTrakcs(tracks []*Track) {
 	tw.Flush()
 }
 
-type multiSort struct {
+type CustomSort struct {
 	t    []*Track
 	less func(x, y *Track) bool
 }
 
-func newMultiSort(t []*Track) multiSort {
-	s := multiSort{t: t, less: func(x, y *Track) bool { return false }}
+func newCustomSort(t []*Track) CustomSort {
+	s := CustomSort{t: t, less: func(x, y *Track) bool { return false }}
 	return s
 }
 
-func (m multiSort) Len() int           { return len(m.t) }
-func (m multiSort) Less(i, j int) bool { return m.less(m.t[i], m.t[j]) }
-func (m multiSort) Swap(i, j int)      { m.t[i], m.t[j] = m.t[j], m.t[i] }
+func (m CustomSort) Len() int           { return len(m.t) }
+func (m CustomSort) Less(i, j int) bool { return m.less(m.t[i], m.t[j]) }
+func (m CustomSort) Swap(i, j int)      { m.t[i], m.t[j] = m.t[j], m.t[i] }
 
-func (m multiSort) byTitle() multiSort {
-	return multiSort{m.t, func(x, y *Track) bool {
+func (m CustomSort) byTitle() CustomSort {
+	return CustomSort{m.t, func(x, y *Track) bool {
 		if x.Title != y.Title {
 			return x.Title < y.Title
 		}
@@ -65,8 +65,8 @@ func (m multiSort) byTitle() multiSort {
 	}}
 }
 
-func (m multiSort) byArtist() multiSort {
-	return multiSort{m.t, func(x, y *Track) bool {
+func (m CustomSort) byArtist() CustomSort {
+	return CustomSort{m.t, func(x, y *Track) bool {
 		if x.Artist != y.Artist {
 			return x.Artist < y.Artist
 		}
@@ -74,8 +74,8 @@ func (m multiSort) byArtist() multiSort {
 	}}
 }
 
-func (m multiSort) byAlbum() multiSort {
-	return multiSort{m.t, func(x, y *Track) bool {
+func (m CustomSort) byAlbum() CustomSort {
+	return CustomSort{m.t, func(x, y *Track) bool {
 		if x.Album != y.Album {
 			return x.Album < y.Album
 		}
@@ -83,8 +83,8 @@ func (m multiSort) byAlbum() multiSort {
 	}}
 }
 
-func (m multiSort) byYear() multiSort {
-	return multiSort{m.t, func(x, y *Track) bool {
+func (m CustomSort) byYear() CustomSort {
+	return CustomSort{m.t, func(x, y *Track) bool {
 		if x.Year != y.Year {
 			return x.Year < y.Year
 		}
@@ -92,8 +92,8 @@ func (m multiSort) byYear() multiSort {
 	}}
 }
 
-func (m multiSort) byLength() multiSort {
-	return multiSort{m.t, func(x, y *Track) bool {
+func (m CustomSort) byLength() CustomSort {
+	return CustomSort{m.t, func(x, y *Track) bool {
 		if x.Length != y.Length {
 			return x.Length < y.Length
 		}
@@ -104,9 +104,9 @@ func (m multiSort) byLength() multiSort {
 func main() {
 	printTrakcs(tracks)
 	fmt.Println("After sort title year")
-	sort.Sort(newMultiSort(tracks).byYear().byTitle())
+	sort.Sort(newCustomSort(tracks).byYear().byTitle())
 	printTrakcs(tracks)
 	fmt.Println("After sort title artist")
-	sort.Sort(newMultiSort(tracks).byArtist().byTitle())
+	sort.Sort(newCustomSort(tracks).byArtist().byTitle())
 	printTrakcs(tracks)
 }

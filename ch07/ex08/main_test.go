@@ -9,13 +9,13 @@ import (
 func TestLimitReader(t *testing.T) {
 	testCases := []struct {
 		name     string
-		input    multiSort
+		input    CustomSort
 		expected []*Track
 	}{
-		{name: "empty", input: multiSort{t: nil}, expected: nil},
+		{name: "empty", input: CustomSort{t: nil}, expected: nil},
 		{
 			name: "no sort Title",
-			input: newMultiSort([]*Track{
+			input: newCustomSort([]*Track{
 				{"GO", "Dlilah", "From the Roots Up", 2012, length("3m38s")},
 				{"Go Ahead", "Alicia Keys", "As I am", 2007, length("4m36s")},
 			}),
@@ -26,7 +26,7 @@ func TestLimitReader(t *testing.T) {
 		},
 		{
 			name: "1 sort Title",
-			input: newMultiSort([]*Track{
+			input: newCustomSort([]*Track{
 				{"GO", "Dlilah", "From the Roots Up", 2012, length("3m38s")},
 				{"Go Ahead", "Alicia Keys", "As I am", 2007, length("4m36s")},
 			}).byTitle(),
@@ -36,7 +36,7 @@ func TestLimitReader(t *testing.T) {
 			},
 		},
 		{name: "1 sort Artist",
-			input: newMultiSort([]*Track{
+			input: newCustomSort([]*Track{
 				{"GO", "Dlilah", "From the Roots Up", 2012, length("3m38s")},
 				{"Go Ahead", "Alicia Keys", "As I am", 2007, length("4m36s")},
 			}).byArtist(),
@@ -46,7 +46,7 @@ func TestLimitReader(t *testing.T) {
 			},
 		},
 		{name: "1 sort Album",
-			input: newMultiSort([]*Track{
+			input: newCustomSort([]*Track{
 				{"GO", "Dlilah", "From the Roots Up", 2012, length("3m38s")},
 				{"Go Ahead", "Alicia Keys", "As I am", 2007, length("4m36s")},
 			}).byAlbum(),
@@ -56,7 +56,7 @@ func TestLimitReader(t *testing.T) {
 			},
 		},
 		{name: "1 sort Year",
-			input: newMultiSort([]*Track{
+			input: newCustomSort([]*Track{
 				{"GO", "Dlilah", "From the Roots Up", 2012, length("3m38s")},
 				{"Go Ahead", "Alicia Keys", "As I am", 2007, length("4m36s")},
 			}).byYear(),
@@ -66,7 +66,7 @@ func TestLimitReader(t *testing.T) {
 			},
 		},
 		{name: "1 sort Length",
-			input: newMultiSort([]*Track{
+			input: newCustomSort([]*Track{
 				{"GO", "Dlilah", "From the Roots Up", 2012, length("3m38s")},
 				{"Go Ahead", "Alicia Keys", "As I am", 2007, length("4m36s")},
 			}).byLength(),
@@ -76,7 +76,7 @@ func TestLimitReader(t *testing.T) {
 			},
 		},
 		{name: "2 sort Year and Title",
-			input: newMultiSort([]*Track{
+			input: newCustomSort([]*Track{
 				{"GO", "Dlilah", "From the Roots Up", 2012, length("3m38s")},
 				{"GO", "Moby", "Moby", 1992, length("3m37s")},
 				{"Go Ahead", "Alicia Keys", "As I am", 2007, length("4m36s")},
@@ -89,7 +89,7 @@ func TestLimitReader(t *testing.T) {
 		},
 		{
 			name: "2 sort Artist and Title",
-			input: newMultiSort([]*Track{
+			input: newCustomSort([]*Track{
 				{"GO", "Dlilah", "From the Roots Up", 2012, length("3m38s")},
 				{"GO", "Moby", "Moby", 1992, length("3m37s")},
 				{"Go Ahead", "Alicia Keys", "As I am", 2007, length("4m36s")},
@@ -143,7 +143,7 @@ func BenchmarkStableSort(b *testing.B) {
 	}
 }
 
-func BenchmarkMultiSort(b *testing.B) {
-	s := newMultiSort(newData()).byTitle().byArtist().byAlbum().byYear().byLength()
+func BenchmarkCustomSort(b *testing.B) {
+	s := newCustomSort(newData()).byTitle().byArtist().byAlbum().byYear().byLength()
 	sort.Stable(s)
 }

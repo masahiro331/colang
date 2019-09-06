@@ -9,7 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"gopl.io/ch05/links"
+	"github.com/masahiro331/ch05/links"
 )
 
 func breadthFirst(f func(item string) []string, worklist []string) {

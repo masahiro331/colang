@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"gopl.io/ch07/ex16/eval"
+	"github.com/masahiro331/colang/ch07/ex16/eval"
 )
 
 type Calculator struct {

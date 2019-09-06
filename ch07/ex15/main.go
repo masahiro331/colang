@@ -9,7 +9,7 @@ import (
 
 	"strconv"
 
-	"gopl.io/ch07/ex15/eval"
+	"github.com/masahiro331/colang/ch07/ex15/eval"
 )
 
 func main() {
