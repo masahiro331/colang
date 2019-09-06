@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 )
 
 type limitReader struct {
@@ -31,15 +32,15 @@ func LimitReader(r io.Reader, n int64) io.Reader {
 func main() {
 	reader := bytes.NewReader([]byte("Hello world"))
 
-	data, err := ioutil.ReadAll(LimitReader(reader, 2))
+	data, err := ioutil.ReadAll(LimitReader(reader, 3))
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	} else {
 		fmt.Println(string(data))
 	}
-	data, err = ioutil.ReadAll(LimitReader(reader, 2))
+	data, err = ioutil.ReadAll(LimitReader(reader, 3))
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	} else {
 		fmt.Println(string(data))
 	}

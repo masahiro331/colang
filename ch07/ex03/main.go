@@ -10,17 +10,6 @@ type tree struct {
 	left, right *tree
 }
 
-func main() {
-	t := tree{}
-	fmt.Println(t.value)
-	add(&t, 1)
-	add(&t, 2)
-	add(&t, 2)
-	add(&t, 3)
-	add(&t, 123)
-	fmt.Println(t.String())
-}
-
 func Sort(values []int) {
 	var root *tree
 	for _, v := range values {
@@ -65,4 +54,12 @@ func (t *tree) String() string {
 		values = append(values, t.right.String())
 	}
 	return strings.Join(values, " ")
+}
+
+func main() {
+	t := tree{}
+	add(&t, 1)
+	add(&t, 2)
+	add(&t, 3)
+	fmt.Println(t.String())
 }

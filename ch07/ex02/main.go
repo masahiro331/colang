@@ -26,9 +26,10 @@ func (c *wrapper) Write(p []byte) (int, error) {
 func main() {
 	buf := bytes.Buffer{}
 	cw, counter := CountingWriter(&buf)
+
 	bs := []byte("Hello, world!")
+
 	cw.Write(bs)
 	fmt.Println(cw)
 	fmt.Println(*counter)
-
 }

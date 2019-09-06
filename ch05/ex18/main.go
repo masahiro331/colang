@@ -17,6 +17,7 @@ func main() {
 		fmt.Fprintf(os.Stdout, "filename: %s\nsize: %d\n", filename, n)
 	}
 }
+
 func fetch(url string) (filename string, n int64, err error) {
 	resp, err := http.Get(url)
 	if err != nil {
@@ -40,5 +41,4 @@ func fetch(url string) (filename string, n int64, err error) {
 
 	n, err = io.Copy(f, resp.Body)
 	return local, n, err
-
 }

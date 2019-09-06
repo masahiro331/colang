@@ -1,13 +1,10 @@
 package main
 
 import (
-	"os"
-
-	"net/http"
-
-	"log"
-
 	"fmt"
+	"log"
+	"net/http"
+	"os"
 
 	"golang.org/x/net/html"
 )

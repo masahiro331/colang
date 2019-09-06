@@ -2,12 +2,9 @@ package main
 
 import (
 	"fmt"
-
-	"os"
-
-	"net/http"
-
 	"io"
+	"net/http"
+	"os"
 
 	"golang.org/x/net/html"
 )

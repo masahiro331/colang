@@ -1,18 +1,17 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
-
-	"fmt"
 
 	"golang.org/x/net/html"
 )
 
 func main() {
 	if len(os.Args) < 2 {
-		log.Fatal("Usage: main url tags...")
+		log.Fatal("Argument error")
 	}
 
 	url := os.Args[1]

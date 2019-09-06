@@ -2,15 +2,11 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"os"
-
-	"net/url"
-
-	"net/http"
-
 	"io/ioutil"
-
+	"log"
+	"net/http"
+	"net/url"
+	"os"
 	"path/filepath"
 
 	"gopl.io/ch05/links"

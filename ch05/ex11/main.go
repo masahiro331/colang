@@ -6,7 +6,6 @@ import (
 	"sort"
 )
 
-// prereqsは情報科学の各講座をそれぞれの事前条件となる講座と対応付けします。
 var prereqs = map[string][]string{
 	"algorithms":      {"data structures"},
 	"calculus":        {"liniear algebra"},

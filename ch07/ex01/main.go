@@ -29,11 +29,10 @@ func (c *LineCounter) Write(p []byte) (int, error) {
 
 func main() {
 	var c WordCounter
-	var name = "Dolly"
-	fmt.Fprintf(&c, "hello, %s. I'm John.", name)
+	fmt.Fprintf(&c, "hogehoge fuga fuga")
 	fmt.Println(c)
+
 	var c2 LineCounter
-	var name2 = "Dolly"
-	fmt.Fprintf(&c2, "hello, %s.\nI'm John.\n", name2)
+	fmt.Fprintf(&c2, "hogehoge fuga fuga")
 	fmt.Println(c2)
 }

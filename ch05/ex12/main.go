@@ -2,18 +2,11 @@ package main
 
 import (
 	"fmt"
-
-	"os"
-
 	"net/http"
+	"os"
 
 	"golang.org/x/net/html"
 )
-
-//forEachNOdeはnから始まるツリー内部の個々のノードxに対して
-//関数pre(x)とpost(x)を呼び出します。その二つの関数はオプションです。
-//preは子ノードを訪れた前に呼び出され
-//postは子ノードを訪れた後に呼び出されます
 
 func main() {
 	for _, url := range os.Args[1:] {

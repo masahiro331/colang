@@ -54,5 +54,5 @@ func (f *celsiusFlag) Set(s string) error {
 		f.Celsius = KToC(Kelvin(value))
 		return nil
 	}
-	return fmt.Errorf("invalid temperature %q", s)
+	return fmt.Errorf("invalid temp: %q", s)
 }

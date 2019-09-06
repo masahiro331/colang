@@ -30,7 +30,7 @@ func main() {
 
 func max(vals ...int) (int, error) {
 	if len(vals) == 0 {
-		return 0, fmt.Errorf("length of func max is more than 1")
+		return 0, fmt.Errorf("Argument error")
 	}
 	max := math.MinInt64
 	for _, val := range vals {
@@ -43,7 +43,7 @@ func max(vals ...int) (int, error) {
 
 func min(vals ...int) (int, error) {
 	if len(vals) == 0 {
-		return 0, fmt.Errorf("length of func min is more than 1")
+		return 0, fmt.Errorf("Argument error")
 	}
 	min := math.MaxInt64
 	for _, val := range vals {
@@ -52,24 +52,4 @@ func min(vals ...int) (int, error) {
 		}
 	}
 	return min, nil
-}
-
-func max2(m int, vals ...int) int {
-	max := m
-	for _, val := range vals {
-		if max < val {
-			max = val
-		}
-	}
-	return max
-}
-
-func min2(m int, vals ...int) int {
-	min := m
-	for _, val := range vals {
-		if min > val {
-			min = val
-		}
-	}
-	return min
 }
