@@ -11,9 +11,9 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
-	"colang/ch10/ex02/archive"
-	_ "colang/ch10/ex02/archive/tar"
-	_ "colang/ch10/ex02/archive/zip"
+	"github.com/masahiro331/colang/ch10/ex02/archive"
+	_ "github.com/masahiro331/colang/ch10/ex02/archive/tar"
+	_ "github.com/masahiro331/colang/ch10/ex02/archive/zip"
 )
 
 func main() {

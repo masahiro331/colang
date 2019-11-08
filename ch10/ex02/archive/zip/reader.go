@@ -8,7 +8,7 @@ import (
 	"errors"
 	"io"
 
-	"colang/ch10/ex02/archive"
+	"github.com/masahiro331/colang/ch10/ex02/archive"
 )
 
 type reader struct {
