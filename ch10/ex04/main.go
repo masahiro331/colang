@@ -26,7 +26,7 @@ func main() {
 		log.Fatalf("Failed to get packages names: %s", err)
 	}
 
-	fmt.Print("Originals: ")
+	fmt.Print("Root: ")
 	printImportPath(pkgInfo)
 
 	pkgDependencies, err := getPkgDependencies(pkgInfo)
@@ -34,17 +34,21 @@ func main() {
 		log.Fatalf("Failed to get packages names: %s", err)
 	}
 	if len(pkgDependencies) < 1 {
-		fmt.Println("No dependencies")
 		return
 	}
-	fmt.Print("Dependencies: ")
-	printImportPath(pkgDependencies)
-}
-func printImportPath(pkg []Package) {
-	for _, p := range pkg {
-		fmt.Printf("%s ", p.ImportPath)
+
+	fmt.Println("Dependencies: ")
+	packageMap := make(map[string]string)
+	for _, pd := range pkgDependencies {
+		packageMap[pd.Name] = pd.ImportPath
 	}
-	fmt.Println()
+	for _, pkg := range pkgInfo {
+		for _, dep := range pkg.Deps {
+			if importPath, ok := packageMap[dep]; ok {
+				fmt.Printf("%s: %s\n", pkg.ImportPath, importPath)
+			}
+		}
+	}
 }
 
 func getPkgInfos(pkges []string) ([]Package, error) {
@@ -92,22 +96,14 @@ func getPkgDependencies(original []Package) ([]Package, error) {
 		if err != nil {
 			return nil, err
 		}
-		if isDependent(&p, originalImportPath) {
-			pkgDependencies = append(pkgDependencies, p)
-		}
+		pkgDependencies = append(pkgDependencies, p)
 	}
 	return pkgDependencies, nil
 }
 
-func isDependent(p *Package, dirs []string) bool {
-loop:
-	for _, dir := range dirs {
-		for _, deps := range p.Deps {
-			if deps == dir {
-				continue loop
-			}
-		}
-		return false
+func printImportPath(pkg []Package) {
+	for _, p := range pkg {
+		fmt.Printf("%s ", p.ImportPath)
 	}
-	return true
+	fmt.Println()
 }

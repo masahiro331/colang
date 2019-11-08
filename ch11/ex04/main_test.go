@@ -25,13 +25,6 @@ func TestIsPalindrome(t *testing.T) {
 		{name: "sentence palindrome1", input: "A man, a plan, a canal: Panama", expected: true},
 		{name: "sentence palindrome2", input: "Evil I did dwell; lewd did I live.", expected: true},
 		{name: "sentence palindrome3", input: "Able was I ere I saw Elba", expected: true},
-		{name: "French palindrome", input: "été", expected: true},
-		{name: "Panama palindrome", input: "Et se resservir, ivresse reste.", expected: true},
-		{name: "non-palindrome1", input: "nomelonnoolemon", expected: false},
-		{name: "non-palindrome2", input: "palindrome", expected: false}, // non-palindrome
-		{name: "semi-palindrome", input: "desserts", expected: false},   // semi-palindrome
-		{name: "Japanese palindrome", input: "たけやぶやけた", expected: true},
-		{name: "Japanese no palindrome", input: "たけやぶがやけた", expected: false},
 	}
 
 	for _, testCase := range testCases {
