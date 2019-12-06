@@ -3,15 +3,34 @@ package sexpr
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"reflect"
 	"strconv"
-	"strings"
 	"text/scanner"
 )
 
-func Unmarshal(data []byte, out interface{}) (err error) {
+var INTERFACES map[string]reflect.Type
+
+type Decoder struct {
+	r io.Reader
+}
+
+func NewDecoder(r io.Reader) *Decoder {
+	return &Decoder{r}
+}
+
+func InterfaceRegister() {
+	INTERFACES = map[string]reflect.Type{
+		"[]int":        reflect.TypeOf([]int{}),
+		"[]string":     reflect.TypeOf([]string{}),
+		"[]float64":    reflect.TypeOf([]float64{}),
+		"[]complex128": reflect.TypeOf([]complex128{}),
+	}
+}
+
+func (d *Decoder) Decode(v interface{}) (err error) {
 	lex := &lexer{scan: scanner.Scanner{Mode: scanner.GoTokens}}
-	lex.scan.Init(bytes.NewReader(data))
+	lex.scan.Init(d.r)
 	lex.next() // get the first token
 	defer func() {
 		// NOTE: this is not an example of ideal error handling.
@@ -19,8 +38,14 @@ func Unmarshal(data []byte, out interface{}) (err error) {
 			err = fmt.Errorf("error at %s: %v", lex.scan.Position, x)
 		}
 	}()
-	read(lex, reflect.ValueOf(out).Elem())
+	read(lex, reflect.ValueOf(v).Elem())
 	return nil
+}
+
+func Unmarshal(data []byte, out interface{}) (err error) {
+	r := bytes.NewBuffer(data)
+	decoder := NewDecoder(r)
+	return decoder.Decode(out)
 }
 
 type lexer struct {
@@ -43,8 +68,13 @@ func read(lex *lexer, v reflect.Value) {
 	case scanner.Ident:
 		// The only valid identifiers are
 		// "nil" and struct field names.
-		if lex.text() == "nil" {
+		switch lex.text() {
+		case "nil":
 			v.Set(reflect.Zero(v.Type()))
+			lex.next()
+			return
+		case "t":
+			v.SetBool(true)
 			lex.next()
 			return
 		}
@@ -59,41 +89,31 @@ func read(lex *lexer, v reflect.Value) {
 		lex.next()
 		return
 	case scanner.Float:
-		switch v.Kind() {
-		case reflect.Float32:
-			f, _ := strconv.ParseFloat(lex.text(), 32) // NOTE: ignoring erros
-			v.SetFloat(f)
-		case reflect.Float64:
-			f, _ := strconv.ParseFloat(lex.text(), 64) // NOTE: ignoring erros
-			v.SetFloat(f)
-		default:
-			panic(fmt.Sprintf("unexpected type: %d", v.Kind()))
-		}
+		f, _ := strconv.ParseFloat(lex.text(), 64) // NOTE: ignoring errors
+		v.SetFloat(float64(f))
 		lex.next()
 		return
 	case '#':
 		lex.next()
-		lex.next()
-		lex.next()
-		r := lex.text()
-		lex.next()
-		i := lex.text()
-		lex.next()
-		lex.next() // consume ')'
-
-		var bitSize int
-		switch v.Kind() {
-		case reflect.Complex64:
-			bitSize = 32
-		case reflect.Complex128:
-			bitSize = 64
-		default:
-			panic(fmt.Sprintf("unexpected type: %d", v.Kind()))
+		if lex.text() != "C" {
+			break
 		}
-		fr, _ := strconv.ParseFloat(r, bitSize)
-		fi, _ := strconv.ParseFloat(i, bitSize)
-		v.SetComplex(complex(fr, fi))
+		lex.next()
+		if lex.text() != "(" {
+			break
+		}
+		lex.next()
+		f1, _ := strconv.ParseFloat(lex.text(), 64)
+		lex.next()
+		f2, _ := strconv.ParseFloat(lex.text(), 64)
+		v.SetComplex(complex(f1, f2))
+		lex.next()
+		if lex.text() != ")" {
+			break
+		}
+		lex.next()
 		return
+
 	case '(':
 		lex.next()
 		readList(lex, v)
@@ -140,45 +160,21 @@ func readList(lex *lexer, v reflect.Value) {
 			v.SetMapIndex(key, value)
 			lex.consume(')')
 		}
+
 	case reflect.Interface:
-		s, _ := strconv.Unquote(lex.text()) // NOTE: ignoring errors
-		item := reflect.New(typeOf(s)).Elem()
+		typeStr, _ := strconv.Unquote(lex.text())
 		lex.next()
-		read(lex, item)
-		v.Set(item)
+		reflectType, ok := INTERFACES[typeStr]
+		if !ok {
+			panic(fmt.Sprintf("unknown type interface %v", typeStr))
+		}
+		value := reflect.New(reflectType).Elem()
+		read(lex, value)
+		v.Set(value)
 
 	default:
 		panic(fmt.Sprintf("cannot decode list into %v", v.Type()))
 	}
-}
-func typeOf(name string) reflect.Type {
-	t, ok := typeRegistered[name]
-	if ok {
-		return t
-	}
-
-	if strings.HasPrefix(name, "[]") {
-		return reflect.SliceOf(typeOf(name[2:]))
-	}
-
-	if name[0] == '[' {
-		i := strings.Index(name, "]")
-		if i > 0 {
-			size, _ := strconv.Atoi(name[1:i]) // NOTE: ignoring errors
-			return reflect.ArrayOf(size, typeOf(name[i+1:]))
-		}
-	}
-
-	if strings.HasPrefix(name, "map") {
-		i := strings.Index(name, "]")
-		if i > 0 {
-			return reflect.MapOf(typeOf(name[4:i]), typeOf(name[i+1:]))
-		}
-
-	}
-
-	panic(fmt.Sprintf("%s not supported\n", name))
-
 }
 
 func endList(lex *lexer) bool {
@@ -189,4 +185,8 @@ func endList(lex *lexer) bool {
 		return true
 	}
 	return false
+}
+
+func init() {
+	InterfaceRegister()
 }
