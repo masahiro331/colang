@@ -1,54 +1,52 @@
 package sexpr
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 )
 
-func Test(t *testing.T) {
-	type Movie struct {
-		Title, Subtitle string
-		Year            int
-		Actor           map[string]string
-		Oscars          []string
-		Sequel          *string
-	}
-	strangelove := Movie{
-		Title:    "Dr. Strangelove",
-		Subtitle: "",
-		Year:     0,
-		Actor: map[string]string{
-			"Dr. Strangelove":            "Peter Sellers",
-			"Grp. Capt. Lionel Mandrake": "",
-			"Pres. Merkin Muffley":       "",
-			"Gen. Buck Turgidson":        "",
-			"Brig. Gen. Jack D. Ripper":  "",
-			`Maj. T.J. "King" Kong`:      "",
-		},
-		Oscars: []string{
-			"",
-			"",
-			"",
-			"",
-		},
+func TestMarshal(t *testing.T) {
+	var tests = []struct {
+		name  string
+		input interface{}
+		want  string
+	}{
+		{name: "bool true", input: true, want: "t"},
+		{name: "bool false", input: false, want: "nil"},
+		{name: "float positive zero", input: 0.0, want: "0.000000"},
+		{name: "float negative zero", input: -0.0, want: "0.000000"},
+		{name: "interface nil", input: struct{ v interface{} }{nil}, want: `((v nil))`},
+		{name: "interface array", input: struct{ v interface{} }{[]int{1, 2, 3}}, want: `((v ("[]int" (1 2 3))))`},
+		{name: "zero check 1 value", input: struct{ x int }{0}, want: "()"},
 	}
 
-	data, err := Marshal(strangelove)
-	if err != nil {
-		t.Fatalf("Marshal failed: %v", err)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got, err := Marshal(test.input)
+			if err != nil || string(got) != test.want {
+				t.Errorf("Marshal(%v) = \n%q, %v\n want %q, nil", test.input, got, err, test.want)
+			}
+		})
 	}
-	t.Logf("Marshal() = \n%s\n", data)
-	fmt.Printf("%+v\n", data)
-
-	var movie Movie
-	if err := Unmarshal(data, &movie); err != nil {
-		t.Fatalf("Unmarshal failed: %v", err)
+}
+func TestIsZeroValue(t *testing.T) {
+	var zeroTests = []struct {
+		input interface{}
+		want  bool
+	}{
+		{false, true},
+		{true, false},
+		{int(0), true},
+		{int(1), false},
+		{uint(0), true},
+		{uint(1), false},
+		{"", true},
+		{"a", false},
 	}
-	t.Logf("Unmarshal() = %+v\n", movie)
-
-	// Check equality.
-	if !reflect.DeepEqual(movie, strangelove) {
-		t.Fatal("not equal")
+	for _, test := range zeroTests {
+		got := isZeroValue(reflect.ValueOf(test.input))
+		if got != test.want {
+			t.Errorf("isZeroValue(%v) = %t\n want %t", test.input, got, test.want)
+		}
 	}
 }
